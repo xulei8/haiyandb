@@ -1,0 +1,12 @@
+{{template "head.tpl"}}
+
+{{template "top.tpl"}}
+
+	<div class=main>
+		<form action=? method=post>
+		 	<textarea name=nums></textarea>
+			<input type=submit />
+		</form>
+	</div>
+
+{{template "foot.tpl"}}

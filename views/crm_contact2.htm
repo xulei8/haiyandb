@@ -1,0 +1,554 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $cfg_soft_lang; ?>" />
+<title>员工与数据管理</title>
+<link href="templets/style/base.css" rel="stylesheet" type="text/css" />
+<style>
+body{font-size: 12px;}
+.error{ background-color:#660000; color:#ffffff ; }
+.cdrs_from{margin-top:12px;margin-left:20px;display: block;font-size: 12px;color:#164A84;line-height:26px;}
+.cdrs_from table{font-size: 12px;color:#164A84;line-height:26px;}
+.cdrs_from table tr{display:block;height:30px;}
+.cdrs_from input{font-size: 12px;line-height:18px;border: 1px solid #ddd;margin-bottom:5px;}
+button, input, select, textarea{font-size: 12px;color:#164A84;line-height:18px;}
+#sub{border:1px solid #333; padding:0px 10px;}
+.error{ background-color:#660000; color:#ffffff ; }
+</style>
+<script type="text/javascript">
+<!--
+function MM_jumpMenu(targ,selObj,restore){ //v3.0
+  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+  if (restore) selObj.selectedIndex=0;
+}
+
+ 
+function selectall()
+{  
+$("input[name='fa[]']").each(function(){
+   $(this).attr("checked",false);
+  });  
+}
+//-->
+</script>
+</head>
+<body> 
+<?php
+$arragent = getMemberArr(); 
+?>
+<div id="main">
+  <?php include(DEDEMEMBER."/templets/head.htm");?>
+  <div id="content">
+    <?php include(DEDEMEMBER."/templets/menu.htm"); ?>
+    <div id="mcpmain">
+      <div id="appTab">
+        <ul>
+		  <?php
+			if($do == "view"){
+				echo "<li><a href=\"#\">数据查看与管理</a></li>";
+			}
+			elseif($sta != ""){
+				echo "<li><a href=\"?sta={$k}&mmname={$mmname}\">".$statu[$sta]."</a></li>";
+			}
+			else{
+				echo "<li><a href=\"#\">话务报表</a></li>";
+			}
+			
+		  ?>
+          
+        </ul>
+      </div>
+	  
+      <div id="mainCp">        
+		<?php if($action=="")
+		{
+		?>
+			 &nbsp;&nbsp;&nbsp;&nbsp;业务员
+			 <select name="jumpMenu" id="jumpMenu" onchange="MM_jumpMenu('parent',this,0)">
+				<?php  foreach($arragent as $a)
+				{
+				$str="";
+				if($mmname ==$a['userid']  ) {$str = " selected  ";}
+					  echo "<option value='?mmname={$a['userid']}&type={$type}&sta={$sta}&calleds={$calleds}'  {$str} >{$a['userid']}-{$a['uname']}</option>";
+				}
+				?>
+			</select>	
+			  <form  method="post" action="crm_contact.php" style="display:inline-block">
+				&nbsp;&nbsp;&nbsp;&nbsp;批次： 
+				 <select name="pppname"  >
+				 <?php
+				  $sql = "select distinct( piname ) as c  from dq_contact  ";
+				   $rs = mysql_query($sql);
+				   while($r = mysql_fetch_array($rs))
+				   {
+				   echo "<option value='{$r['c']}'>{$r['c']}</option>";
+				   }
+				 ?>
+				 </select>
+				 <input  type="submit" value="查找">
+			  </form>
+			<form method="post" action="?action=savefa">
+			 <!--  <FORM METHOD=POST ACTION="?">
+				<INPUT TYPE="text" NAME="keyw"><INPUT TYPE="submit">
+			  </FORM> -->
+			  <hr>
+				&nbsp;&nbsp;&nbsp;&nbsp;发放/回收客户
+					<select name="fauname">
+				<?php
+				echo "<option value=''  >回收</option>";
+				  echo "<option value='8099'  >CCCC</option>";
+				if($loginid!="10000")
+				{
+				foreach( $arragent as $a)
+				{
+					  echo "<option value='{$a['userid']}'  >{$a['userid']}-{$a['uname']}</option>";
+				}
+				}
+				else
+				{
+				$arragentb = getMemberBossArr();
+foreach( $arragentb as $a)
+				{
+					  echo "<option value='{$a['userid']}'  >{$a['userid']}-{$a['uname']}</option>";
+				}
+
+
+				}
+						 
+						?></select>
+						<?php
+				if($loginid=="10000")
+				{
+					echo "<input type=text value=0 style='width:60px;' name=fanum>";
+				}
+						?>
+				<!--<input  type="submit" name="deleteall" value="删除本页所选客户">-->
+				<input  type="hidden" name="sta" value="<?php echo $sta ;?>"  >
+				<input type="submit">
+				<?php
+				$f=time().".csv";
+				$ff="";
+				?>
+			<div style="width:500px;float:right;text-align:left;color:green;font-weight:bold;">导出当前页客户资料<a href="<?php echo $f ;?>" target=_blank>下载</a>
+			</div>
+		  <table width="100%" border="0" cellpadding="0" cellspacing="0" class="list">
+			  <thead>
+				<tr>
+				  <th  ><a onclick="selectall();">全</a></th><th  >姓名</th>
+				  <th >电话</th>  <th >电话2</th>
+				  <th  >批次 </th>  <th  >发布时间</th>
+				  <th >最后拨打</th>
+				  <th  >所属分机</th>
+				  <th  >类别</th>
+				 <th  >状态</th>
+				   <th  >操作</th>
+				</tr>
+			  </thead>
+			  <tbody>
+			   <tr>
+				  <td colspan="10"><div class="pageList">{dede:pagelist listsize=5/}</div></td>
+				</tr>
+			  {dede:datalist}
+				<tr>
+				  <td class="tabTitle"><input type="checkbox" value="<?php echo $fields['id']; ?>" checked  name="fa[]"></td>
+				  <td align="center"><a  href="agent_call.php?uid=<?php echo $fields['id']; ?>"><?php if(trim($fields['uname'])!="")echo $fields['uname'] ; else echo "NAME"; ?> </a></td>
+				  <td align="center"><?php echo $fields['tel']; ?></td> <td align="center"><?php echo $fields['tel2']; ?></td>
+				 <td align="center"><?php echo $fields['piname']; ?></td>   
+				  <td align="center"><?php echo str_time($fields['insert_time']); ?></td>
+				   <td align="center"><?php echo str_time2($fields['lastcall_time']); ?></td>
+				 <td align="center"><?php echo $fields['mname']; ?></td>   
+				 
+				   <td align="center"><?php echo $statu[$fields['statu']]; ?></td>
+					<td align="center"><?php if( $fields['called']!=0) echo "<font color=#ff0000>已打</font>"; else echo "未打"; ?></td>
+				   <!--<td  ><?php echo $fields['piname']; ?></td>
+				  <td  ><?php echo $fields['call_hits']; ?></td>
+					   <td ><?php echo $fields['action_hits']; ?></td>-->
+				  <td align=center><a  href="?delete=<?php echo $fields['id']; ?>&sta=<?php echo $sta; ?>">删除</a></td>
+				
+				</tr>
+				<?php
+					$head_title="编号,姓名,电话,电话2,客服,客户分类,批次\n";
+					if(trim($fields['uname'])!="")
+					$uname=$fields['uname'] ;
+					else 
+					$uname="NAME";
+					if(($cfg_ml->M_LoginID)==10000)
+					{
+					$ff.= "{$fields['id']},{$uname},{$fields['tel']},{$fields['tel2']},{$fields['mname']},{$statu[$fields['statu']]},{$fields['piname']}\n";
+					}
+					$content=$head_title.$ff;
+				  ?>
+			 {/dede:datalist}
+			  </tbody>
+			  <tfoot>
+				<tr>
+				  <td colspan=8 ><div class="pageList">{dede:pagelist listsize=5/}</div></td>
+				</tr>
+			  </tfoot>
+
+				<?php
+			`rm -rf 1*.csv`;
+			file_put_contents($f,$content);
+			?>
+			</table> 
+</form> 
+
+		<?php
+
+ 
+		}
+		?>
+
+	<?php if($action=="import")
+		{
+		?>
+ <form method="post" action="?action=saveimport"  enctype="multipart/form-data">
+<div style="display:block ;width:100%;height:20px; clear:both ;">
+客户导入</div>
+ 
+  <table width=800>
+  <tr>
+	<td>批次 </td>
+	<td><input type="text" name="piname"></td>
+	<td>上传文件</td>
+<td><input type="file" name="file" id="file" /></td>
+<td><a href=import_mod.xls target=_blank>请下载模板，在模板文件中处理好数据以后再上传.</a></td>	
+  </tr>
+  </table>
+	
+ 
+	<textarea name="nums" rows="18" cols="119" style="margin:12px 12px ;width:90%;"></textarea>
+<br>
+
+<input type="submit" value=" 提 交 ">
+<br> <font color="#777777">(说明：号码导入格式 : 号码,姓名,号码2,地址 每行有且只有一条数据.可用粘贴数据和Excel上传两种方式导入数据.)</font><br>
+ </form>
+	<?php
+		}
+		?>
+		
+		
+		<?php if($action=="shengyulist")
+		{
+		?>
+ 
+ 
+ <table width="100%" border="0" cellpadding="0" cellspacing="0" class="list">
+          <thead>
+            <tr>
+              <th width="16%">电话</th>
+              <th width="12%">剩余数量</th> 
+              
+            </tr>
+          </thead>
+          <tbody>
+          
+          {dede:datalist}
+          <?php
+          $str = "";
+          if($fields['c']<100){$str = "  class=error  ";}
+          ?>
+            <tr >
+              <td class="tabTitle"><a href="crm_contact.php?mmname=<?php echo  $fields['mname'] ; ?>&calleds=no"><?php  if($fields['mname']!=""){echo  $fields['mname'];}
+              	 else{ echo "-- 未分发 --";} ?>
+              	 </a> </td>
+              <td align="center" <?php  echo $str ; ?>><?php echo $fields['c']; ?></td> 
+ 
+            
+            </tr>
+         {/dede:datalist}
+          </tbody>
+           
+        </table> 
+        
+        
+        
+	<?php
+		}
+		?>
+		
+		<?php
+		if($action == "huishou"){
+		?>
+		<form method="post" action="">
+			<input type="hidden" name="action" value="huishou">
+			<input type="hidden" name="huishou" value="do"> 
+			<input type="submit" value="确认回收" style="margin-left:20px;margin-top:50px;"> 
+			<?php
+			if($huishou == "do"){
+				echo $info;
+			}
+			?>
+		</form> 
+		<?php
+		}
+		?>
+		<?php 
+		if($action=="good_calls")
+		
+		{
+		?>    
+	
+		<form method="post" action="?action=good_calls">
+			<input type="hidden" name="action" value="good_calls"> 
+			<div class="select_d">
+				<table width="900" border="0" cellspacing="0" cellpadding="0"  class="cdrs_from">
+				  
+				  <tr>
+					<td width=100>开始日期</td>
+					<td width=220><input   style="width:150px" class="easyui-datebox" data-options="formatter:myformatter,parser:myparser" type="text" name="s_time" value="<?php echo $s_time; ?>"></td>
+					<td width=100>结束日期</td>
+					<td width=220><input   style="width:150px"  class="easyui-datebox" data-options="formatter:myformatter,parser:myparser" type="text" name="e_time" value="<?php echo $e_time; ?>"></td>
+					<td><input type="submit" value="确定"></td>
+				  </tr>			  
+				</table>
+			</div>		
+		</form>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" class="list">
+          <thead>
+            <tr>
+              <th>员工坐席</th>
+              <th>总个数</th>
+			  <th>有效通话个数</th>
+			  <th>有效通话平均时长(s)</th>
+			  <th>有效通话总时长(m)</th> 
+            </tr>
+          </thead>
+          <tbody>
+           {dede:datalist}
+            <tr >
+              <td class="tabTitle" align="center"><?php echo $fields['src'];?>
+           </td>
+              <td align="center"><?php echo $fields['c']; ?> </td>
+			  <td align="center"><?php echo $fields['b']; ?> </td> 
+              <td align="center"><?php echo $fields['l']; ?> </td>
+			  <td align="center"><?php echo $fields['m']; ?> </td> 
+            
+            </tr>
+         {/dede:datalist}
+          </tbody> 
+        </table> 
+        
+        
+        
+	<?php
+		}
+		?>
+	
+		
+		<?php 
+		if($action=="cdrs")
+		{
+		eui();
+		?>
+    
+	 <script type="text/javascript">
+        function myformatter(date){
+            var y = date.getFullYear();
+            var m = date.getMonth()+1;
+            var d = date.getDate();
+            return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d) + " 01:00:00";
+        }
+        function myparser(s){
+            if (!s) return new Date();
+            var ss = (s.split('-'));
+            var y = parseInt(ss[0],10);
+            var m = parseInt(ss[1],10);
+            var d = parseInt(ss[2],10);
+            if (!isNaN(y) && !isNaN(m) && !isNaN(d)){
+                return new Date(y,m-1,d);
+            } else {
+                return new Date();
+            }
+        }
+    </script>
+		<form method="post" action="?action=cdrs" >
+			<div style="clear:both ; margin:12px 12px ; ">
+			<table width="900" border="0" cellspacing="0" cellpadding="0"  class="cdrs_from">
+			  <tr>
+				<td  width=100>开始日期</td>
+				<td width=220><input   style="width:150px" class="easyui-datebox" data-options="formatter:myformatter,parser:myparser" type="text" name="s_time" value="<?php echo $s_time; ?>"/></td>
+				<td width=100>结束日期</td>
+				<td width=220><input   style="width:150px"  class="easyui-datebox" data-options="formatter:myformatter,parser:myparser" type="text" name="end_time" value="<?php echo $end_time; ?>"/></td>
+			  </tr>
+			  <tr>
+				<td>主叫号码：</td>
+				<td><input  type="text" name="src" value="<?php echo $src; ?>"/></td>
+				<td>被叫号码：</td>
+				<td><input  type="text" name="dst"  value="<?php echo $dst; ?>"/></td>
+			  </tr>
+			  <tr>
+				<td>每页显示条数</td>
+				<td><input  type="text" name="pagenum"/></td><td>&nbsp;</td>
+				<td><input  type="submit" id="sub"/></td>
+			  </tr>
+			  
+			</table>
+		</div>		
+		</form>
+		<!--<form method="post" action="?action=cdr">精确查询 号码<input  type="text" name="ext1"><input  type="submit"></form>-->
+		 
+        <div class="pageList">{dede:pagelist listsize=5/}</div>
+ <table width="100%" border="0" cellpadding="0" cellspacing="0" class="list">
+          <thead>
+            <tr>
+              <th width="16%">拨打时间</th>
+              <th  >打出分机</th> 
+              <th  >客户电话</th> 
+              <th  >时长</th>
+			  <th  >状态</th> 
+              <th  >录音</th> </tr>
+          </thead>
+          <tbody>
+          
+          {dede:datalist}
+          <?php
+           
+          ?>
+            <tr >
+              <td class="tabTitle"><?php echo $fields['calldate']; ?></td>
+              <td align="center" <?php  echo $str ; ?>><?php echo $fields['src']; ?></td> 
+      <td align="center" <?php  echo $str ; ?>><?php echo $fields['dst']; ?></td> 
+     
+     
+   <td align="center" <?php  echo $str ; ?>><?php echo $fields['billsec']; ?></td> 
+  
+     <td align="center" <?php  echo $str ; ?>><?php echo $arrStatus[$fields['disposition']]; ?></td> 
+  
+   <td align="center" <?php  echo $str ; ?>><?php $s = $fields['userfield']; 
+  $s  = str_replace("audio:","",$s);
+   if($s!=='') { echo "<a href=http://192.168.0.211/wav.php?f={$s}
+   target=\"_blank\">查看</a>  ";}
+   else
+   echo "<font color=#cc3300>无录音</font>";
+   ?></td>       
+            </tr>
+         {/dede:datalist}
+          </tbody>
+           
+        </table> 
+       
+        
+	<?php
+		}
+		?>
+		<?php if($action=="stalist")
+		{
+		?>
+ 
+ 
+ <table width="100%" border="0" cellpadding="0" cellspacing="0" class="list">
+          <thead>
+            <tr>
+              <th width="16%">类别</th>
+              <th  >总数</th> 
+         
+            </tr>
+          </thead>
+          <tbody>
+          
+          {dede:datalist}
+            <tr>
+              <td class="tabTitle"><?php echo  $statu[$fields['statu']] ; ?></td>
+              <td align="center"><?php echo $fields['c']; ?></td> 
+ 
+             
+            </tr>
+         {/dede:datalist}
+          </tbody>
+           
+        </table> 
+        
+        
+        
+	<?php
+		}
+		?>
+		
+		
+		<?php if($action=="group")
+		{
+		?>
+ 
+ 
+ <table width="100%" border="0" cellpadding="0" cellspacing="0" class="list">
+          <thead>
+            <tr>
+              <th width="10%">电话</th>
+              <th width="10%">所有号码</th> 
+              <th width="10%">未打</th>
+			  <th width="10%">无效</th>
+			  <th width="15%">意向</th>
+			  <th width="15%">待核</th>
+			  <th width="15%">成交</th>
+			  <th width="15%">核心</th>
+            </tr>
+          </thead>
+          <tbody>
+          
+          {dede:datalist}
+            <tr>
+              <td class="tabTitle"><a href="crm_contact.php?mmname=<?php echo  $fields['mname'] ; ?>&type="><?php  if($fields['mname']!=""){echo  $fields['mname'];}
+              	 else{ echo "-- 未分发 --";} ?>
+              	 </a> </td>
+              <td align="center"><?php echo $fields['c']; ?></td> 
+ 
+              <td align="center">           
+				<a href="crm_contact.php?mmname=<?php echo  $fields['mname'] ; ?>&calleds=no">未打</a> 
+              </td>
+			  <td align="center">
+				<a href="crm_contact.php?sta=-1&mmname=<?php echo  $fields['mname'] ; ?>">无效客户</a>
+              </td>
+			  <td align="center">
+				<a href="crm_contact.php?sta=1&mmname=<?php echo  $fields['mname'] ; ?>">意向客户</a>
+              </td>
+			  <td align="center">
+				<a href="crm_contact.php?sta=2&mmname=<?php echo  $fields['mname'] ; ?>">待核客户</a>
+              </td>
+			  <td align="center">
+				<a href="crm_contact.php?sta=3&mmname=<?php echo  $fields['mname'] ; ?>">成交客户</a>
+              </td> 
+			  <td align="center">
+				<a href="crm_contact.php?sta=5&mmname=<?php echo  $fields['mname'] ; ?>">核心客户</a>
+              </td>           
+             
+              
+            </tr>
+         {/dede:datalist}
+          </tbody>
+           
+        </table> 
+        
+        
+        
+	<?php
+		}
+		
+		 if($action=="change")
+		
+		{
+		?>
+ 交换数据
+ <br> <br> <br> 注意， 填写要交换的双方号码，不能写错。处理后数据不能返回。
+  <form  method="post" action="?action=savechange">
+ <br><br><br><br> 交换号码1：<input type="text" name="cfrom" value="8**">
+  <br><br><br><br>
+ 交换号码2： <input  type="text" name="cto" value="8**">
+  <br><br><br><br>
+  <input type="submit" value="  OK  ">
+  
+  
+  </form>
+        
+	<?php
+		}		?>
+      </div>
+      <!--主操作区域 -->
+    </div>
+	<div class="clear"></div> 
+  </div>
+
+<?php include(DEDEMEMBER."/templets/foot.htm"); ?>  
+</div>
+</body>
+</html>

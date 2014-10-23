@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $cfg_soft_lang; ?>" />
+<title>座席拨打电话</title>
+<link href="templets/style/base.css" rel="stylesheet" type="text/css" />
+</head>
+<body> 
+<div id="main">
+  <?php include(DEDEMEMBER."/templets/head.htm");?>
+  <div id="content">
+    <?php include(DEDEMEMBER."/templets/menu.htm"); ?>
+    <div id="mcpmain">
+      <div id="appTab">
+        <ul>
+          <li class="thisTab"><a href="#">拨打电话</a></li>
+        </ul>
+      </div>
+	  <!-- 
+      <ul class="tabSub">
+       
+		   
+		  <li style="float:right">
+		  <form method="post" action="agent_contact.php?action=search"  id="c-search">
+		  <input type="hidden" name="action" value="search"> 
+		  客户查找：<input type="text" name="keyword"><input  type="submit" value="确认"></form></li>
+		  <div class="clear"></div> 
+      </ul>
+	  -->
+      <div id="mainCp">
+
+      <?php if($isdone!=""){echo "已经打完";exit();} ?>
+	  <script type="text/javascript">
+        function myformatter(date){
+            var y = date.getFullYear();
+            var m = date.getMonth()+1;
+            var d = date.getDate();
+            return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d);
+        }
+        function myparser(s){
+            if (!s) return new Date();
+            var ss = (s.split('-'));
+            var y = parseInt(ss[0],10);
+            var m = parseInt(ss[1],10);
+            var d = parseInt(ss[2],10);
+            if (!isNaN(y) && !isNaN(m) && !isNaN(d)){
+                return new Date(y,m-1,d);
+            } else {
+                return new Date();
+            }
+        }
+    </script>
+      
+      <form method="post"   action="?dosave=<?php echo $r['id'] ; ?>" target="dosave"> 
+      <table width="880" id="custom-info" style="border-top:1px solid #ccc">
+		<tr>
+      		<th>姓名</td><td><input type="text"  name=uname value="<?php echo $r['uname'] ; ?>"></td>
+      		<th>性别</td>
+			<td><select name="sexn">
+				<?php 
+					foreach($sex as $k=> $v)
+					{
+					$str = ""; if($k==$r['sex']){ $str=" selected "; }
+					echo "<option value='{$k}'  {$str}>{$v}</option>" ;
+					}
+				 ?> 
+      			</select>
+			</td>
+			<th>地址</td><td><input type="text" name="addr" value="<?php echo $r['addr'] ; ?>"></td>
+		</tr>
+		<tr>
+      		<th>手机</td><td>
+			
+			<input type="hidden" name="tel" value="<?php echo $r['tel'] ; ?>">
+			<a href="/dial.php?ext=<?php echo $cfg_ml->M_LoginID; ?>&m=<?php echo $r['tel'];  ?>"   target="dosave"  class="htmlButton"  style="width:140px ;">拨打<?php echo strtel($r['tel']) ; ?></a>
+			</td>
+      		<th>电话</td><td>
+				<a href="/dial.php?ext=<?php echo $cfg_ml->M_LoginID; ?>&m=<?php echo $r['tel2'];  ?>"   target="dosave"  class="htmlButton"  style="width:140px ;">拨打<?php echo strtel($r['tel2']) ; ?></a>
+			<input type="text" name="tel2" style="width:80px ; float:left ;" value="<?php echo $r['tel2'] ; ?>">
+			
+			
+			</td>
+			<th>客户状态</td><td><input type="text" name="statu" disabled value="<?php echo $statu[$r['statu']]; ?>"> </td> 
+		</tr>
+	 
+        <tr>
+      		<th>导入时间</td><td><?php echo str_time($r['insert_time']) ; ?></td>      		
+			<th>初次拨打</td><td><?php echo str_time2($r['firstcall_time']) ; ?></td>
+			<th>最后拨打</td><td>{{.C.LastCalltime}}</td>
+		</tr>
+		<tr>
+			<?php eui();?>
+			<th>预约时间</th>
+			<td>
+					<input   style="width:90px;" class="easyui-datebox" data-options="formatter:myformatter,parser:myparser" type="text" name="nextcall_time" value="<?php echo substr($r['nextcall_time'],0,10); ?>">
+					<select name="nextcall_h">
+						<?php
+							$nextcall_h = substr($r['nextcall_time'],11,2);
+							for($i = 8;$i <= 20;$i++){
+								if($i < 10){
+									$i = "0".$i;
+								}
+								if($i == $nextcall_h){
+									$select = "selected='selected'";
+								}
+								else{
+									$select = "";
+								}
+								echo "<option value='{$i}' {$select}>{$i}</option>";
+							}
+						?>
+					</select>
+			</td>   
+      <th>备注</td><td colspan="3"><input type="text" name="note" value="<?php echo $r['note'] ; ?>" size=60></td>
+		</tr>
+		<tr>
+			<td></td><td colspan="5">
+			<input  type="submit"  class=htmlButton value="保存更改"><iframe frameborder="0" scrolling="no"  name="dosave" id="dosave"  src="" width="80"  height="20"></iframe>
+			<a href="?called=called0" class=htmlButton>上一个</a>
+			<a href="?next=1&lastcalltimes=<?php echo $r['lastcall_time']  ; ?>"  class=htmlButton>下一个</a>
+			<a href="agent_contact.php?action=add" target="_blank"   class=htmlButton>添加客户</a>
+			<?php if($r['erpid']>0 )
+			{
+			?>
+				<a 
+				href="../../index.php?module=Accounts&parenttab=Sales&action=DetailView&record=<?php  echo $r['erpid'];  ?>" 
+				target="_blank"  
+				class=htmlButton>ERP查看</a>
+			 <?php
+			}
+			else
+			{
+			?>
+			<a href="agent_contact.php?addtocrm=<?php echo $r['id'] ;?>&goback=callout/member/agent_call.php" target="_blank"   class=htmlButton>添加到ERP</a>
+			<?php
+			}
+			?>
+			 <a href="#"  class=htmlButton>发短信</a> 
+			<?php echo $r['savet'];
+		   if($r['savet']!="")
+		   {
+		   echo "  <a href=?deletesave=1>清空列队</a>";
+		   }
+		   ?></td>
+		</tr>
+      </table>
+	  </form>
+
+	  <!--客户状态处理表单及业务日志-->
+      <table width="880"   align="center"  width="880" id="custom-info" style="border-top:1px solid #ccc">
+      	<tr>
+      		<td width="420">
+      			<iframe src="agent_call_action.php?uid=<?php echo $r['id'] ; ?>&pstu=<?php echo $r['statu'] ;  ?>&stus=<?php echo $r['statu'] ; ?>" width="420" height="400" id="call_action" scrolling="no"  frameborder="0"   ></iframe>
+      		</td>
+			<td>
+				<iframe name="faction"  id="faction"  src="agent_call_log.php?uid=<?php echo $r['id'] ; ?>" width="420"   frameborder="0"   height="400"></iframe>
+      		</td>
+      	</tr>
+      </table>
+      
+	  <!--内容消息提示 -->
+	   
+      </div>
+      <!--主操作区域 -->
+    </div>
+  </div>
+ 
+</div>
+</body>
+</html>

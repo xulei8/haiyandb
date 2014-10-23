@@ -1,0 +1,334 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!--
+客户状态备注：
+*最后修改时间：2013-09-29
+*by：吴海艳
+-->
+<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $cfg_soft_lang; ?>" />
+<title>座席客户管理</title>
+<link href="templets/style/base.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+	#c-search{
+		margin-top:4px;
+	}
+	#customerAdd{}
+
+</style>
+
+</head>
+<body  oncontextmenu='return false' onselectstart ='return false' onselect='document.selection.empty()' oncopy='document.selection.empty()' onbeforecopy='return false'> 
+<div id="main">
+  <?php include(DEDEMEMBER."/templets/head.htm"); ?>
+  <div id="content">
+    <?php include(DEDEMEMBER."/templets/menu.htm"); ?>
+    <div id="mcpmain">
+      <div id="appTab">
+        <ul>
+			
+          <li class="thisTab">
+			<a href="#">
+				<?php
+					if($action == "add"){
+						echo "客户添加";
+					}
+					elseif(!empty($status)){
+						echo $statu[$status];
+					}
+					elseif($called == "called0"){
+						echo "未拨打";
+					}
+					elseif($called == "called1"){
+						echo "已拨打";
+					}
+					elseif($calltype == "1"){
+						echo "未接听";
+					}
+					else{
+						echo "客户查看";
+					}
+				?>
+			</a></li>
+			<li id="" style="float:right;border:none;margin:0px 100px 0px 0px;position: relative;height: 25px;background:none;font-weight: bold;"><a href="agent_contact.php?action=add">添加客户</a></li>
+        </ul>
+      </div>
+	  <?php eui();?>
+		<script type="text/javascript">
+			function myformatter(date){
+				var y = date.getFullYear();
+				var m = date.getMonth()+1;
+				var d = date.getDate();
+				return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d);
+			}
+			function myparser(s){
+				if (!s) return new Date();
+				var ss = (s.split('-'));
+				var y = parseInt(ss[0],10);
+				var m = parseInt(ss[1],10);
+				var d = parseInt(ss[2],10);
+				if (!isNaN(y) && !isNaN(m) && !isNaN(d)){
+					return new Date(y,m-1,d);
+				} else {
+					return new Date();
+				}
+			}
+		</script> 
+      <div id="mainCp">
+				<?php if($action == "" || $action == "search")
+				{
+				?>
+<div id=agentsearchpan>
+<form method="post" action="agent_contact.php?action=search" id="c-search">
+			<input type="hidden" name="action" value="search"> 
+		<table class="search002">
+			<tr>
+				<td align="right">姓名/号码</td><td colspan="2"><input type="text" name="keyword" style="width:120px;" value="<?php echo $keyword;?>"></td>
+				<td align="right">性别</td><td>
+								<select name="sex">
+									<option value="0">全部</option>
+									<option value="1" <?php if($sex == 1) echo "selected";?>>男</option>
+									<option value="2" <?php if($sex == 2) echo "selected";?>>女</option>
+								</select>&nbsp;&nbsp;&nbsp;&nbsp;
+							</td>
+				<td align="right">客户分类</td><td>
+								<select name="status">
+								<option value="">全部</option> 
+								<?php
+									$str = "";
+									foreach($statu as $k=>$v){
+										if($status != "" && $status != " ")
+										{
+											if($k == $status){
+												$str = "  selected=\"selected\" ";
+											}
+											else{
+												$str = "";
+											}
+										}
+										else{
+											$str = "";
+										}
+										echo "<option value=\"{$k}\" {$str}>{$v}</option>";
+									}
+								?>								
+							</select></td>	
+				
+			</tr>
+			<tr>
+				<td align="right" width="80">最后拨打</td><td colspan="2"><input type="text" name="lastcall_time_s" style="width:100px;" class="easyui-datebox" data-options="formatter:myformatter,parser:myparser" value="<?php echo $lastcall_time_s;?>">
+				
+				<select name="nextcall_n">
+						<?php
+							//$nextcall_h = substr($r['nextcall_time'],11,2);
+							for($i = 8;$i <= 20;$i++){
+								if($i < 10){
+									$i = "0".$i;
+								}
+								if($i == $nextcall_n){
+									$select = "selected='selected'";
+								}
+								else{
+									$select = "";
+								}
+								echo "<option value='{$i}' {$select}>{$i}</option>";
+							}
+						?>
+					</select>
+					
+					
+				 <input type="text" name="lastcall_time_n" style="width:100px;" class="easyui-datebox" data-options="formatter:myformatter,parser:myparser" value="<?php echo $lastcall_time_n;?>">
+				  
+						<select name="nextcall_n_">
+						<?php
+							//$nextcall_h = substr($r['nextcall_time'],11,2);
+							for($i = 8;$i <= 20;$i++){
+								if($i < 10){
+									$i = "0".$i;
+								}
+								if($i == $nextcall_n_){
+									$select = "selected='selected'";
+								}
+								else{
+									$select = "";
+								}
+								echo "<option value='{$i}' {$select}>{$i}</option>";
+							}
+						?>
+					</select>
+					
+				</td>
+				<td align="right" width="80">预约时间</td><td colspan="3"><input type="text" name="nextcall_time_s" style="width:100px;" class="easyui-datebox" data-options="formatter:myformatter,parser:myparser"value="<?php echo $nextcall_time_s;?>">
+				
+				<select name="nextcall_h">
+						<?php
+							//$nextcall_h = substr($r['nextcall_time'],11,2);
+							for($i = 8;$i <= 20;$i++){
+								if($i < 10){
+									$i = "0".$i;
+								}
+								if($i == $nextcall_h){
+									$select = "selected='selected'";
+								}
+								else{
+									$select = "";
+								}
+								echo "<option value='{$i}' {$select}>{$i}</option>";
+							}
+						?>
+					</select>
+					
+					
+				 <input type="text" name="nextcall_time_n" style="width:100px;" class="easyui-datebox" data-options="formatter:myformatter,parser:myparser"value="<?php echo $nextcall_time_n;?>">
+					
+					<select name="nextcall_h_">
+						<?php
+							//$nextcall_h_ = substr($r['nextcall_time_'],11,2);
+							for($i = 8;$i <= 20;$i++){
+								if($i < 10){
+									$i = "0".$i;
+								}
+								if($i == $nextcall_h_){
+									$select = "selected='selected'";
+								}
+								else{
+									$select = "";
+								}
+								echo "<option value='{$i}' {$select}>{$i}</option>";
+							}
+						?>
+					</select>
+					
+					
+				</td>
+				<td  colspan="2"></td>
+				<td rowspan="2" valign="middle"><input  type="submit" value="查找"></td>				
+			</tr>
+		</table>
+		</form>
+</div>
+
+		<form method="post" action="?action=savecall">
+		  <table width="100%" border="0" cellpadding="0" cellspacing="0" class="list">
+			  <thead>
+				<tr>
+				<th width="20"></th>
+				  <th   >姓名</th>
+				  <th>电话</th>
+				  <th>电话2</th>
+				  <th>最后拨打</th>
+				  <th>预约时间</th>
+				  <th>类别</th>
+				  <th>结果</th>
+				</tr>
+			  </thead>
+			  <tbody>
+			  {dede:datalist}
+				<tr>
+			
+				<td   >
+					<input  type="checkbox" name="addcall[]" checked="checked" value="<?php echo $fields['id']; ?>">
+					
+				</td>
+				  <td class="tabTitle"><a   href='agent_call.php?uid=<?php echo $fields['id']; ?>'   title="<?php echo $fields['piname']; ?>"><?php echo $fields['uname'];if(trim($fields['uname'])=="")echo "无名"; 
+				 if($fields['mname']!=$cfg_ml->M_LoginID)
+				 {
+				 $sst = "";
+				if(  $fields['mname']=="" )$sst = "admin"; 
+				 echo "({$fields['mname']}{$sst})";
+				 }
+				  ?> </a></td>
+				  <td align="center"><?php echo strtel($fields['tel']); ?></td> <td align="center"><?php echo strtel($fields['tel2']); ?></td>
+					<td align="center"><?php echo str_time2(  $fields['lastcall_time']); ?></td>
+				  <td align="center"><?php echo substr($fields['nextcall_time'],0,13); ?></td>
+				   
+		 
+				   <td align="center"><?php echo $statu[$fields['statu']]; ?></td>
+
+					   <td align="center"><?php echo $callarr[$fields['called']]; ?></td>
+				  
+				  <td align="center"><?php echo $fields['click']; ?></td>
+			
+				
+				</tr>
+			 {/dede:datalist}
+			  </tbody>
+			  <tfoot>
+				<tr>
+					<td></td>
+				<td ><input name="savecalldo" colspan="2" type="submit" value="添加到拨打列队" style="width:120px;"></td>    
+				  <td colspan="4"><div class="pageList">{dede:pagelist listsize=5/}</div></td>
+				</tr>
+			  </tfoot>
+			</table> 
+			
+		</form>
+		<?php
+				}
+				?>
+	<?php if($action=="add")
+		{
+		?>
+	 <form method="post" action="?action=saveadd" id="customerAdd">
+		<table width="500">
+		 <tr>
+			<td width="60" align="right">姓名</td><td><input  type="text" name="n"></td> 
+		 </tr>
+		 <tr>
+			<td width="60" align="right">电话</td><td><input  type="text" name="ts"></td> 
+		 </tr>
+		 <tr>
+			<td width="60" align="right">电话2</td><td><input  type="text" name="t2"></td> 
+		 </tr>
+		 <tr>
+			<td width="60" align="right">业务员</td><td><input  type="text" name="mnameadd" <?php  echo "value='$cfg_ml->M_LoginID'";?>  disabled></td> 
+		 </tr>
+		 <tr>
+			<td width="60" align="right">客户类别</td><td>
+				<select name="cji">
+					<?php 
+					$b=array();
+					if($ltype=="8")
+					{
+						foreach($statu as $k1=>$v1){
+							if($k1 < 0){
+								continue;
+							}
+							$b[$k1] = $v1;
+						}
+					}
+					if($ltype=="9")
+					{
+					$b[3]=$statu[3];
+					$b[4]=$statu[4];
+					
+					
+					$b[5]=$statu[5];
+					$b[8]=$statu[6];
+					}
+					
+					foreach($b as $k => $v )
+				echo " 	<option value=\"{$k}\">{$v}</option>";
+				?>
+				</select>
+			</td> 
+		 </tr>
+		 <tr>
+			<td width="60" align="right">地址</td><td><input  type="text" name="addr"></td> 
+		 </tr>
+		 <tr>
+			<td width="60" align="right"></td><td><input type="submit" name="提交" value="提交"></td> 
+		 </tr>
+	</table>
+	 </form>
+	<?php
+		}
+		?>
+      </div>
+      <!--主操作区域 -->
+    </div>
+  </div>
+ 
+</div>
+</body>
+</html>
