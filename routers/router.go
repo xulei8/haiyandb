@@ -16,5 +16,8 @@ func init() {
 	beego.Router("/gocrm_crmimport", &controllers.CrmImport{})
 	beego.Router("/gocrm_agentcallaction", &controllers.CallAction{})
 	beego.Router("/gocrm_agentcalllog", &controllers.CallLog{})
+	beego.Router("/data_save/", &controllers.NewSQLSave{})
+
+	beego.Router("/data_get/", &controllers.NewSQLGet{})
 
 }
