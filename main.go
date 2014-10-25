@@ -12,6 +12,7 @@ import (
 	"github.com/astaxie/beego"
 	m "github.com/xulei8/haiyandb/models"
 	_ "github.com/xulei8/haiyandb/routers"
+
 	"os"
 )
 

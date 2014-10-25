@@ -2,21 +2,23 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Basic CRUD Application - jQuery EasyUI CRUD Demo</title>
+    <title>NewSQL 数据管理</title>
     <link rel="stylesheet" type="text/css" href="static/jui/themes/default/easyui.css">
     <link rel="stylesheet" type="text/css" href="static/jui/themes/icon.css">
     <link rel="stylesheet" type="text/css" href="static/jui/themes/color.css">
     <link rel="stylesheet" type="text/css" href="static/jui/demo/demo.css">
     <script type="text/javascript" src="static/jui/jquery.min.js"></script>
     <script type="text/javascript" src="static/jui/jquery.easyui.min.js"></script>
+	    <script type="text/javascript" src="static/jui/locale/easyui-lang-zh_CN.js"></script>
+	
 </head>
 <body>
-    
-    <a href="http://{{.Website}}">{{.Website}}</a>
+    	 <a href="http://{{.Website}}">{{.Website}}</a>
 			    <br />
 			     {{.Email}}
-    
-    <table id="dg" title="用户管理" class="easyui-datagrid" style="width:700px;height:250px"
+				
+ 	
+    <table id="dg" title="{{.AppName}}管理-" class="easyui-datagrid" style="width:700px;height:250px"
             url="/data_get/"
             toolbar="#toolbar" pagination="true"
             rownumbers="true" fitColumns="true" singleSelect="true">
@@ -30,9 +32,9 @@
         </thead>
     </table>
     <div id="toolbar">
-        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">New User</a>
-        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">Edit User</a>
-        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">Remove User</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">新建</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">编辑</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">删除</a>
     </div>
     
     <div id="dlg" class="easyui-dialog" style="width:400px;height:280px;padding:10px 20px"
@@ -58,22 +60,25 @@
         </form>
     </div>
     <div id="dlg-buttons">
-        <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveUser()" style="width:90px">Save</a>
-        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">Cancel</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveUser()" style="width:90px">保存</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">取消</a>
     </div>
+	
+				
+		
     <script type="text/javascript">
         var url;
         function newUser(){
-            $('#dlg').dialog('open').dialog('setTitle','New User');
+            $('#dlg').dialog('open').dialog('setTitle','新建');
             $('#fm').form('clear');
             url = '/data_save/';
         }
         function editUser(){
             var row = $('#dg').datagrid('getSelected');
             if (row){
-                $('#dlg').dialog('open').dialog('setTitle','Edit User');
+                $('#dlg').dialog('open').dialog('setTitle','编辑');
                 $('#fm').form('load',row);
-                url = 'update_user.php?id='+row.id;
+                url = '/data_update/?id='+row.id;
             }
         }
         function saveUser(){
@@ -99,9 +104,9 @@
         function destroyUser(){
             var row = $('#dg').datagrid('getSelected');
             if (row){
-                $.messager.confirm('Confirm','Are you sure you want to destroy this user?',function(r){
+                $.messager.confirm('请确认删除','确认要删除这条记录吗？',function(r){
                     if (r){
-                        $.post('destroy_user.php',{id:row.id},function(result){
+                        $.post('/data_delete/',{id:row.id},function(result){
                             if (result.success){
                                 $('#dg').datagrid('reload');    // reload the user data
                             } else {
@@ -139,6 +144,10 @@
             width:160px;
         }
     </style>
+	
+	
+
+				
 </body>
 </html>
  
