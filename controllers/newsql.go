@@ -178,7 +178,10 @@ func (this *NewSQLUpdate) Post() {
 	if len(title2) > 1 {
 		title = title2
 	}
-	sql = " update app set   title = '" + title + "', data =  COLUMN_CREATE(" + str + ")  where id = " + id + "  limit 1 ;"
+	tt := time.Now()
+
+	t := tt.String()
+	sql = " update app set  edittime = '" + t + "',   title = '" + title + "', data =  COLUMN_CREATE(" + str + ")  where id = " + id + "  limit 1 ;"
 
 	o.Raw(sql).Exec()
 
