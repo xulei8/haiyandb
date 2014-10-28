@@ -8,10 +8,16 @@ import (
 )
 
 type NewSQLFiled struct {
-	Label string
-	Name  string
-	List  bool
-	Add   bool
+	Label      string
+	Name       string
+	List       bool
+	ListWidth  string
+	Add        bool
+	AddRequire bool
+	AddType    string
+	HideInNew  bool
+	HideInEdit bool
+	HideInList bool
 }
 
 type NewSQLModel struct {
@@ -23,6 +29,7 @@ type NewSQLModel struct {
 	Allowupdate bool
 
 	TitleFiled string
+	DataKey    string
 
 	Fileds []NewSQLFiled
 }
@@ -54,20 +61,40 @@ func init() {
 	newm.AppKey = "app"
 	newm.AppName = "用户"
 	newm.TitleFiled = "firstname"
+	newm.DataKey = "demo"
 
 	nf := NewSQLFiled{}
 	nf.Add = true
 	nf.List = true
 	nf.Label = "姓名"
 	nf.Name = "firstname"
+	nf.AddRequire = true
 
 	nf1 := NewSQLFiled{}
 	nf1.Add = true
 	nf1.List = true
 	nf1.Label = "昵称"
 	nf1.Name = "lastname"
+	nf1.AddRequire = true
+	nf1.ListWidth = "110px"
 
-	f1s = append(f1s, nf, nf1)
+	nf2 := NewSQLFiled{}
+	nf2.Add = true
+	nf2.List = true
+	nf2.Label = "电话"
+	nf2.Name = "phone"
+	nf2.HideInNew = true
+
+	nf3 := NewSQLFiled{}
+	nf3.Add = true
+	nf3.List = true
+	nf3.Label = "邮件"
+	nf3.Name = "email"
+	nf3.AddType = "email"
+	nf3.HideInEdit = true
+	nf3.HideInList = false
+
+	f1s = append(f1s, nf, nf1, nf2, nf3)
 	newm.Fileds = f1s
 	mNewSQLModel["app"] = newm
 
@@ -75,12 +102,17 @@ func init() {
 func (this *NewSQLSave) Post() {
 	o := orm.NewOrm()
 	sql := ""
+	mod := this.GetString("modName")
+	modKey := mNewSQLModel[mod].DataKey
 
 	formData := this.Input()
 	i := 0
 	str := ""
 	title := ""
 	for k, v := range formData {
+		if k == "modName" {
+			continue
+		}
 		if i == 0 {
 			str += "\"" + k + "\"," + "\"" + v[0] + "\""
 			title = v[0]
@@ -89,11 +121,16 @@ func (this *NewSQLSave) Post() {
 		}
 		i++
 	}
+
+	title2 := this.GetString(mNewSQLModel[mod].TitleFiled)
+	if len(title2) > 1 {
+		title = title2
+	}
 	tt := time.Now()
 
 	t := tt.String()
 
-	sql = "insert into app(title ,type,createorid,ownerid ,data, createtime) values('" + title + "','demo',1,1,COLUMN_CREATE(" + str + ") ,'" + t + "');"
+	sql = "insert into app(title ,type,createorid,ownerid ,data, createtime) values('" + title + "','" + modKey + "',1,1,COLUMN_CREATE(" + str + ") ,'" + t + "');"
 
 	o.Raw(sql).Exec()
 	this.Ctx.WriteString(`{"success":true }`)
@@ -105,6 +142,7 @@ func (this *NewSQLDelete) Post() {
 	o := orm.NewOrm()
 	sql := ""
 	id := this.GetString("id")
+
 	sql = " update app set  deleted = 1 where id =  " + id + " limit 1 "
 
 	o.Raw(sql).Exec()
@@ -117,22 +155,30 @@ func (this *NewSQLUpdate) Post() {
 	o := orm.NewOrm()
 	sql := ""
 	id := this.GetString("id")
-
+	mod := this.GetString("modName")
 	formData := this.Input()
 	i := 0
 	str := ""
+	title := ""
 
 	for k, v := range formData {
+		if k == "modName" {
+			continue
+		}
 		if i == 0 {
 			str += "\"" + k + "\"," + "\"" + v[0] + "\""
+			title = v[0]
 
 		} else {
 			str += ",\"" + k + "\"," + "\"" + v[0] + "\""
 		}
 		i++
 	}
-
-	sql = " update app set data =  COLUMN_CREATE(" + str + ")  where id = " + id + "  limit 1 ;"
+	title2 := this.GetString(mNewSQLModel[mod].TitleFiled)
+	if len(title2) > 1 {
+		title = title2
+	}
+	sql = " update app set   title = '" + title + "', data =  COLUMN_CREATE(" + str + ")  where id = " + id + "  limit 1 ;"
 
 	o.Raw(sql).Exec()
 
@@ -153,6 +199,11 @@ func (this *NewSQLGet) Post() {
 	o := orm.NewOrm()
 	var dd []NewsqlData
 
+	mod := this.GetString("modName")
+	modKey := mNewSQLModel[mod].DataKey
+	//fmt.Print(mod)
+	//fmt.Println(modKey)
+
 	rows, _ := this.GetInt("rows")
 	page, _ := this.GetInt("page")
 
@@ -165,15 +216,16 @@ func (this *NewSQLGet) Post() {
 	}
 	page--
 	skip := rows * page
-	sql := "  select id    from app where type = 'demo' and deleted = 0    "
+	sql := "  select id    from app where type = '" + modKey + "' and deleted = 0    "
 
 	allnum, _ := o.Raw(sql).QueryRows(&dd)
 	skips := fmt.Sprintf("%d", skip)
 	rowss := fmt.Sprintf("%d", rows)
-	sql = "  select id  , title ,createtime, column_json(data) as data  from app where type = 'demo' and deleted = 0   order by id desc limit " + skips + " ," + rowss
+	sql = "  select id  , title ,createtime, column_json(data) as data  from app where type = '" + modKey + "' and deleted = 0   order by id desc limit " + skips + " ," + rowss
 
 	nums, err := o.Raw(sql).QueryRows(&dd)
 
+	fmt.Println(sql)
 	if err == nil && nums > 0 {
 
 		//	fmt.Print(dd)

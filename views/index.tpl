@@ -5,58 +5,99 @@
     <title>NewSQL 数据管理</title>
     <link rel="stylesheet" type="text/css" href="static/jui/themes/default/easyui.css">
     <link rel="stylesheet" type="text/css" href="static/jui/themes/icon.css">
-    <link rel="stylesheet" type="text/css" href="static/jui/themes/color.css">
-    <link rel="stylesheet" type="text/css" href="static/jui/demo/demo.css">
+  
     <script type="text/javascript" src="static/jui/jquery.min.js"></script>
     <script type="text/javascript" src="static/jui/jquery.easyui.min.js"></script>
 	    <script type="text/javascript" src="static/jui/locale/easyui-lang-zh_CN.js"></script>
+
+	  <style type="text/css">
+        #fm{
+            margin:0;
+            padding:10px 30px;
+        }
+        .ftitle{
+            font-size:14px;
+            font-weight:bold;
+            padding:5px 0;
+            margin-bottom:10px;
+            border-bottom:1px solid #ccc;
+        }
+        .fitem{
+            margin-bottom:5px;
+        }
+        .fitem label{
+            display:inline-block;
+            width:80px;
+        }
+        .fitem input{
+            width:160px;
+        }
+    </style>
+	
+	
 	
 </head>
 <body>
-    	 <a href="http://{{.Website}}">{{.Website}}</a>
-			    <br />
-			     {{.Email}}
+    	
+
 				
  	
-    <table id="dg" title="{{.AppName}}管理-" class="easyui-datagrid" style="width:700px;height:250px"
-            url="/data_get/"
+    <table id="dg" title="{{.AppName}}管理" class="easyui-datagrid" style="width:700px;height:450px"
+            url="/data_get/?modName={{.ModName}}"
             toolbar="#toolbar" pagination="true"
             rownumbers="true" fitColumns="true" singleSelect="true">
         <thead>
             <tr>
-                <th field="firstname" width="50">First Name</th>
-                <th field="lastname" width="50">Last Name</th>
-                <th field="phone" width="50">Phone</th>
-                <th field="email" width="50">Email</th>
+			
+			 {{range .FS}}
+			{{ if .HideInList}}
+			
+			{{else}}
+	                  <th field="{{.Name}}" 
+					{{if .ListWidth}}
+					style=" width:{{.ListWidth}};  "
+					{{else}}
+					style=" min-width:50;  "
+					{{end}}
+					>{{.Label}}</th>
+			 {{end}}
+            {{end}}
+             
             </tr>
         </thead>
     </table>
+	
     <div id="toolbar">
+	 {{if .ToolNew}} 
         <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">新建</a>
-        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">编辑</a>
-        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">删除</a>
-    </div>
+         {{end}}
+		{{if .ToolEdit}} 
+		<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">编辑</a>
+       {{end}}
+		{{if .ToolDelete}} 
+		   <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">删除</a>
+	   {{end}}  
+ </div>
     
     <div id="dlg" class="easyui-dialog" style="width:400px;height:280px;padding:10px 20px"
             closed="true" buttons="#dlg-buttons">
-        <div class="ftitle">用户信息</div>
+        <div class="ftitle">{{.AppName}}信息</div>
         <form id="fm" method="post" novalidate>
-            <div class="fitem">
-                <label>First Name:</label>
-                <input name="firstname" class="easyui-textbox" required="true">
+             {{range .FS}}
+                  
+			 <div class="fitem {{if .HideInNew}} filedHideInNew {{end}}   {{if .HideInEdit}} filedHideInEdit {{end}}" hideInNew="{{.HideInNew}}"  HideInEdit="{{.HideInEdit}}">
+                <label>{{.Label}}</label>
+                <input name="{{.Name}}" class="easyui-textbox" 
+				{{if .AddRequire }}
+				required="true"
+				{{end}}
+				 	validType="{{.AddType}}"
+				>
             </div>
-            <div class="fitem">
-                <label>Last Name:</label>
-                <input name="lastname" class="easyui-textbox" required="true">
-            </div>
-            <div class="fitem">
-                <label>Phone:</label>
-                <input name="phone" class="easyui-textbox">
-            </div>
-            <div class="fitem">
-                <label>Email:</label>
-                <input name="email" class="easyui-textbox" validType="email">
-            </div>
+            {{end}}
+			
+			
+         
         </form>
     </div>
     <div id="dlg-buttons">
@@ -70,15 +111,22 @@
         var url;
         function newUser(){
             $('#dlg').dialog('open').dialog('setTitle','新建');
+		
             $('#fm').form('clear');
-            url = '/data_save/';
+				$('.filedHideInEdit').show()
+			$('.filedHideInNew').hide()
+            url = '/data_save/?modName={{.ModName}}';
         }
         function editUser(){
             var row = $('#dg').datagrid('getSelected');
             if (row){
+				
                 $('#dlg').dialog('open').dialog('setTitle','编辑');
                 $('#fm').form('load',row);
-                url = '/data_update/?id='+row.id;
+				
+				$('.filedHideInNew').show()
+			$('.filedHideInEdit').hide()
+                url = '/data_update/?id='+row.id + '&modName={{.ModName}}';
             }
         }
         function saveUser(){
@@ -121,30 +169,7 @@
             }
         }
     </script>
-    <style type="text/css">
-        #fm{
-            margin:0;
-            padding:10px 30px;
-        }
-        .ftitle{
-            font-size:14px;
-            font-weight:bold;
-            padding:5px 0;
-            margin-bottom:10px;
-            border-bottom:1px solid #ccc;
-        }
-        .fitem{
-            margin-bottom:5px;
-        }
-        .fitem label{
-            display:inline-block;
-            width:80px;
-        }
-        .fitem input{
-            width:160px;
-        }
-    </style>
-	
+  
 	
 
 				
