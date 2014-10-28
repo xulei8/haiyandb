@@ -8,16 +8,20 @@ import (
 )
 
 type NewSQLFiled struct {
-	Label      string
-	Name       string
-	List       bool
-	ListWidth  string
-	Add        bool
-	AddRequire bool
-	AddType    string
-	HideInNew  bool
-	HideInEdit bool
-	HideInList bool
+	Label        string
+	Name         string
+	List         bool
+	ListWidth    string
+	Add          bool
+	AddRequire   bool
+	AddType      string
+	HideInNew    bool
+	HideInEdit   bool
+	HideInList   bool
+	JuiType      string
+	Values       []NewSQLSelectValue
+	FisSelectBox bool
+	FisDateBox   bool
 }
 
 type NewSQLModel struct {
@@ -32,6 +36,12 @@ type NewSQLModel struct {
 	DataKey    string
 
 	Fileds []NewSQLFiled
+}
+
+type NewSQLSelectValue struct {
+	Value     string
+	Lable     string
+	IsDefault bool
 }
 
 var mNewSQLModel = map[string]NewSQLModel{}
@@ -76,7 +86,7 @@ func init() {
 	nf1.Label = "昵称"
 	nf1.Name = "lastname"
 	nf1.AddRequire = true
-	nf1.ListWidth = "110px"
+	nf1.ListWidth = "60px"
 
 	nf2 := NewSQLFiled{}
 	nf2.Add = true
@@ -94,7 +104,34 @@ func init() {
 	nf3.HideInEdit = true
 	nf3.HideInList = false
 
-	f1s = append(f1s, nf, nf1, nf2, nf3)
+	nf4 := NewSQLFiled{}
+	nf4.Add = true
+	nf4.List = true
+	nf4.Label = "语言"
+	nf4.Name = "lang"
+	nf4.AddType = "email"
+	nf4.HideInEdit = false
+	nf4.HideInList = false
+	nf4.JuiType = "easyui-combobox"
+	nf4.FisSelectBox = true
+
+	var vls []NewSQLSelectValue
+	vl := NewSQLSelectValue{}
+	vl.Lable = "男"
+	vl.Value = "Male"
+	v2 := NewSQLSelectValue{Lable: "女", Value: "Female"}
+	vls = append(vls, vl, v2)
+	nf4.Values = vls
+
+	nf5 := NewSQLFiled{}
+	nf5.Add = true
+	nf5.List = true
+	nf5.Label = "邮件"
+	nf5.Name = "birth"
+	nf5.AddType = "email"
+	nf5.FisDateBox = true
+
+	f1s = append(f1s, nf, nf1, nf2, nf3, nf4, nf5)
 	newm.Fileds = f1s
 	mNewSQLModel["app"] = newm
 

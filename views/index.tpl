@@ -42,7 +42,7 @@
 
 				
  	
-    <table id="dg" title="{{.AppName}}管理" class="easyui-datagrid" style="width:700px;height:450px"
+    <table id="dg" title="{{.AppName}}管理" class="easyui-datagrid" style="width:900px;height:450px"
             url="/data_get/?modName={{.ModName}}"
             toolbar="#toolbar" pagination="true"
             rownumbers="true" fitColumns="true" singleSelect="true">
@@ -84,16 +84,44 @@
         <div class="ftitle">{{.AppName}}信息</div>
         <form id="fm" method="post" novalidate>
              {{range .FS}}
-                  
-			 <div class="fitem {{if .HideInNew}} filedHideInNew {{end}}   {{if .HideInEdit}} filedHideInEdit {{end}}" hideInNew="{{.HideInNew}}"  HideInEdit="{{.HideInEdit}}">
-                <label>{{.Label}}</label>
-                <input name="{{.Name}}" class="easyui-textbox" 
-				{{if .AddRequire }}
-				required="true"
+	                  {{if .JuiType  }}
+						 <div class="fitem {{if .HideInNew}} filedHideInNew {{end}}   {{if .HideInEdit}} filedHideInEdit {{end}}" hideInNew="{{.HideInNew}}"  HideInEdit="{{.HideInEdit}}">
+			                <label>{{.Label}}</label>
+			             
+							{{ if .FisSelectBox}}
+							<select class="{{.JuiType}}" name="{{.Name}}"  
+							{{if .AddRequire }}
+							required="true"
+							{{end}}
+							  
+							>
+							 {{range .Values}}
+								<option value="{{.Value}}">{{.Lable}}</option>
+							{{end}}
+							 </select>
+								
+							{{end}}
+							
+						{{if .FisDateBox}}
+								<input class="easyui-datebox"  name="{{.Name}}"></input>
+								{{end}}
+             
+			            </div>
+				{{else}}
+					 <div class="fitem {{if .HideInNew}} filedHideInNew {{end}}   {{if .HideInEdit}} filedHideInEdit {{end}}" hideInNew="{{.HideInNew}}"  HideInEdit="{{.HideInEdit}}">
+			                <label>{{.Label}}</label>
+								{{if .FisDateBox}}
+								<input class="easyui-datebox"  name="{{.Name}}"></input>
+								{{else}}
+			                <input name="{{.Name}}" class="easyui-textbox" 
+							{{if .AddRequire }}
+							required="true"
+							{{end}}
+							 	validType="{{.AddType}}"
+							>
+							{{end}}
+			            </div>
 				{{end}}
-				 	validType="{{.AddType}}"
-				>
-            </div>
             {{end}}
 			
 			
