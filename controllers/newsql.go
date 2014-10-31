@@ -8,20 +8,19 @@ import (
 )
 
 type NewSQLFiled struct {
-	Label        string
-	Name         string
-	List         bool
-	ListWidth    string
-	Add          bool
-	AddRequire   bool
-	AddType      string
-	HideInNew    bool
-	HideInEdit   bool
-	HideInList   bool
-	JuiType      string
-	Values       []NewSQLSelectValue
-	FisSelectBox bool
-	FisDateBox   bool
+	Label      string
+	Name       string
+	List       bool
+	ListWidth  string
+	Add        bool
+	AddRequire bool
+	AddType    string
+	HideInNew  bool
+	HideInEdit bool
+	HideInList bool
+	JuiType    string
+
+	FDataOption string
 }
 
 type NewSQLModel struct {
@@ -36,12 +35,6 @@ type NewSQLModel struct {
 	DataKey    string
 
 	Fileds []NewSQLFiled
-}
-
-type NewSQLSelectValue struct {
-	Value     string
-	Lable     string
-	IsDefault bool
 }
 
 var mNewSQLModel = map[string]NewSQLModel{}
@@ -79,6 +72,7 @@ func init() {
 	nf.Label = "姓名"
 	nf.Name = "firstname"
 	nf.AddRequire = true
+	nf.JuiType = "easyui-textbox"
 
 	nf1 := NewSQLFiled{}
 	nf1.Add = true
@@ -87,6 +81,7 @@ func init() {
 	nf1.Name = "lastname"
 	nf1.AddRequire = true
 	nf1.ListWidth = "60px"
+	nf1.JuiType = "easyui-textbox"
 
 	nf2 := NewSQLFiled{}
 	nf2.Add = true
@@ -94,6 +89,7 @@ func init() {
 	nf2.Label = "电话"
 	nf2.Name = "phone"
 	nf2.HideInNew = true
+	nf2.JuiType = "easyui-textbox"
 
 	nf3 := NewSQLFiled{}
 	nf3.Add = true
@@ -103,39 +99,74 @@ func init() {
 	nf3.AddType = "email"
 	nf3.HideInEdit = true
 	nf3.HideInList = false
+	nf3.JuiType = "easyui-textbox"
 
 	nf4 := NewSQLFiled{}
 	nf4.Add = true
 	nf4.List = true
 	nf4.Label = "语言"
 	nf4.Name = "lang"
-	nf4.AddType = "email"
+
 	nf4.HideInEdit = false
 	nf4.HideInList = false
 	nf4.JuiType = "easyui-combobox"
-	nf4.FisSelectBox = true
-
-	var vls []NewSQLSelectValue
-	vl := NewSQLSelectValue{}
-	vl.Lable = "男"
-	vl.Value = "Male"
-	v2 := NewSQLSelectValue{Lable: "女", Value: "Female"}
-	vls = append(vls, vl, v2)
-	nf4.Values = vls
+	//nf4.FDataOption = "valueField: 'id', textField: 'text',  data: [{  \"id\":1,  \"text\":\"text1\"},{\"id\":2,\"text\":\"text2\"}] "
+	nf4.FDataOption = "valueField: 'text', textField: 'text', url:'/data_select_values/?keys=app'   "
 
 	nf5 := NewSQLFiled{}
 	nf5.Add = true
 	nf5.List = true
-	nf5.Label = "邮件"
+	nf5.Label = "生日"
 	nf5.Name = "birth"
-	nf5.AddType = "email"
-	nf5.FisDateBox = true
-
+	nf5.JuiType = "easyui-datebox"
 	f1s = append(f1s, nf, nf1, nf2, nf3, nf4, nf5)
 	newm.Fileds = f1s
 	mNewSQLModel["app"] = newm
 
 }
+
+type NewSQLSelectValue struct {
+	beego.Controller
+}
+
+func (this *NewSQLSelectValue) Post() {
+
+	mod := this.GetString("keys")
+	if len(mod) < 1 {
+		return
+	}
+	var dd []NewsqlData
+	o := orm.NewOrm()
+	modKey := mNewSQLModel[mod].DataKey
+	sql := "  select  id  , title ,createtime, column_json(data)   from app where type = '" + modKey + "' and deleted = 0   order by id "
+	fmt.Printf(sql)
+	nums, err := o.Raw(sql).QueryRows(&dd)
+
+	if nums == 0 {
+		this.Ctx.WriteString("[]")
+		return
+	}
+
+	if err == nil && nums > 0 {
+
+		//	fmt.Print(dd)
+	}
+	i := 0
+	strj := "["
+
+	for _, v := range dd {
+		if i > 0 {
+			strj += ","
+		}
+		i++
+		strid := fmt.Sprintf("%d", v.Id)
+		strj += "{ \"id\" : \"" + strid + "\"  , \"text\" : \"" + v.Title + "\" }"
+	}
+	strj += " ]"
+	this.Ctx.WriteString(strj)
+
+}
+
 func (this *NewSQLSave) Post() {
 	o := orm.NewOrm()
 	sql := ""

@@ -9,7 +9,7 @@
     <script type="text/javascript" src="static/jui/jquery.min.js"></script>
     <script type="text/javascript" src="static/jui/jquery.easyui.min.js"></script>
 	    <script type="text/javascript" src="static/jui/locale/easyui-lang-zh_CN.js"></script>
-
+ 
 	  <style type="text/css">
         #fm{
             margin:0;
@@ -84,44 +84,18 @@
         <div class="ftitle">{{.AppName}}信息</div>
         <form id="fm" method="post" novalidate>
              {{range .FS}}
-	                  {{if .JuiType  }}
+	                
 						 <div class="fitem {{if .HideInNew}} filedHideInNew {{end}}   {{if .HideInEdit}} filedHideInEdit {{end}}" hideInNew="{{.HideInNew}}"  HideInEdit="{{.HideInEdit}}">
 			                <label>{{.Label}}</label>
 			             
-							{{ if .FisSelectBox}}
-							<select class="{{.JuiType}}" name="{{.Name}}"  
-							{{if .AddRequire }}
-							required="true"
-							{{end}}
-							  
-							>
-							 {{range .Values}}
-								<option value="{{.Value}}">{{.Lable}}</option>
-							{{end}}
-							 </select>
-								
-							{{end}}
-							
-						{{if .FisDateBox}}
-								<input class="easyui-datebox"  name="{{.Name}}"></input>
-								{{end}}
-             
-			            </div>
-				{{else}}
-					 <div class="fitem {{if .HideInNew}} filedHideInNew {{end}}   {{if .HideInEdit}} filedHideInEdit {{end}}" hideInNew="{{.HideInNew}}"  HideInEdit="{{.HideInEdit}}">
-			                <label>{{.Label}}</label>
-								{{if .FisDateBox}}
-								<input class="easyui-datebox"  name="{{.Name}}"></input>
-								{{else}}
-			                <input name="{{.Name}}" class="easyui-textbox" 
+							    <input name="{{.Name}}" class="{{.JuiType}}"  
+ id="{{.Name}}" 	 
 							{{if .AddRequire }}
 							required="true"
 							{{end}}
 							 	validType="{{.AddType}}"
 							>
-							{{end}}
-			            </div>
-				{{end}}
+							</div>
             {{end}}
 			
 			
@@ -136,6 +110,13 @@
 				
 		
     <script type="text/javascript">
+	//$("#lang").attr("data-options",js_init_stroption1);
+	
+	{{range .FS}}
+		{{ if .FDataOption}}
+	$("#{{.Name}}").attr("data-options", {{.FDataOption}} );  
+		{{end}}
+	{{end}}
         var url;
         function newUser(){
             $('#dlg').dialog('open').dialog('setTitle','新建');
