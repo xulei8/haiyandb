@@ -121,8 +121,271 @@ func init() {
 	nf5.JuiType = "easyui-datebox"
 	f1s = append(f1s, nf, nf1, nf2, nf3, nf4, nf5)
 	newm.Fileds = f1s
-	mNewSQLModel["app"] = newm
 
+	newm2 := NewSQLModel{}
+	newm2.AllowAdd = true
+	newm2.AllowDelete = true
+	newm2.Allowupdate = true
+	newm2.AppKey = "contact"
+	newm2.AppName = "客户"
+	newm2.TitleFiled = "aname"
+	newm2.DataKey = "custom"
+
+	nff := NewSQLFiled{}
+	nff.Add = true
+	nff.List = true
+	nff.Label = "客户"
+	nff.Name = "aname"
+	nff.AddRequire = true
+	nff.JuiType = "easyui-textbox"
+	nff.ListWidth = "60px"
+
+	nff1 := NewSQLFiled{}
+	nff1.Add = true
+	nff1.List = true
+	nff1.Label = "手机"
+	nff1.Name = "tel"
+	nff1.AddRequire = true
+
+	nff1.JuiType = "easyui-textbox"
+
+	nff4 := NewSQLFiled{}
+	nff4.Add = true
+	nff4.List = true
+	nff4.Label = "电话"
+	nff4.Name = "otherphone"
+	nff4.JuiType = "easyui-textbox"
+
+	nff2 := NewSQLFiled{}
+	nff2.Add = true
+	nff2.List = true
+	nff2.Label = "地址"
+	nff2.Name = "addr"
+	nff2.JuiType = "easyui-textbox"
+
+	nfa4 := NewSQLFiled{}
+	nfa4.Add = true
+	nfa4.List = true
+	nfa4.Label = "客户类别"
+	nfa4.Name = "acctype"
+
+	nfa4.JuiType = "easyui-combobox"
+	nfa4.FDataOption = "valueField: 'text', textField: 'text',  data: [{  \"id\":1,  \"text\":\"成交客户\"},{\"id\":2,\"text\":\"重点客户\"},{\"id\":3,\"text\":\"无效客户\"}] "
+	//nf4.FDataOption = "valueField: 'text', textField: 'text', url:'/data_select_values/?keys=app'   "
+
+	nff21 := NewSQLFiled{}
+	nff21.Add = true
+	nff21.List = true
+	nff21.Label = "QQ"
+	nff21.Name = "qq"
+	nff21.JuiType = "easyui-textbox"
+
+	nf311 := NewSQLFiled{}
+	nf311.Add = true
+	nf311.List = true
+	nf311.Label = "邮件"
+	nf311.Name = "email"
+	nf311.AddType = "email"
+	nf311.JuiType = "easyui-textbox"
+
+	nff21n := NewSQLFiled{}
+	nff21n.Add = true
+	nff21n.List = true
+	nff21n.Label = "备注"
+	nff21n.Name = "note"
+	nff21n.JuiType = "easyui-textbox"
+
+	var f2s []NewSQLFiled
+	f2s = append(f2s, nff, nff1, nff4, nfa4, nff2, nff21, nf311, nff21n)
+
+	newm2.Fileds = f2s
+
+	newm3 := NewSQLModel{}
+	newm3.AllowAdd = true
+	newm3.AllowDelete = true
+	newm3.Allowupdate = true
+	newm3.AppKey = "config"
+	newm3.AppName = "配置"
+	newm3.TitleFiled = "aname"
+	newm3.DataKey = "conf"
+
+	cf1 := NewSQLFiled{}
+	cf1.Add = true
+	cf1.List = true
+	cf1.Label = "配置名称"
+	cf1.Name = "aname"
+	cf1.AddRequire = true
+	cf1.JuiType = "easyui-textbox"
+	cf1.ListWidth = "60px"
+
+	cf2 := NewSQLFiled{}
+	cf2.Add = true
+	cf2.List = true
+	cf2.Label = "变量"
+	cf2.Name = "keys"
+	cf2.AddRequire = true
+	cf2.JuiType = "easyui-textbox"
+
+	cf3 := NewSQLFiled{}
+	cf3.Add = true
+	cf3.List = true
+	cf3.Label = "值"
+	cf3.Name = "value"
+	cf3.JuiType = "easyui-textbox"
+
+	cf4 := NewSQLFiled{}
+	cf4.Add = true
+	cf4.List = true
+	cf4.Label = "说明"
+	cf4.Name = "note"
+	cf4.JuiType = "easyui-textbox"
+
+	var f3s []NewSQLFiled
+	f3s = append(f3s, cf1, cf2, cf3, cf4)
+	newm3.Fileds = f3s
+
+	newmmod := NewSQLModel{}
+	newmmod.AllowAdd = true
+	newmmod.AllowDelete = true
+	newmmod.Allowupdate = true
+	newmmod.AppKey = "modsconfig"
+	newmmod.AppName = "模块"
+	newmmod.TitleFiled = "aname"
+	newmmod.DataKey = "mods"
+
+	modsf1 := NewSQLFiled{}
+	modsf1.Add = true
+	modsf1.List = true
+	modsf1.Label = "模块名称"
+	modsf1.Name = "aname"
+	modsf1.AddRequire = true
+	modsf1.JuiType = "easyui-textbox"
+	modsf1.ListWidth = "60px"
+
+	modsf2 := NewSQLFiled{}
+	modsf2.Add = true
+	modsf2.List = true
+	modsf2.Label = "模块名"
+	modsf2.Name = "appname"
+	modsf2.AddRequire = true
+	modsf2.JuiType = "easyui-textbox"
+
+	modsf3 := NewSQLFiled{}
+	modsf3.Add = true
+	modsf3.List = true
+	modsf3.Label = "主键名"
+	modsf3.Name = "appkef"
+	modsf3.AddRequire = true
+	modsf3.JuiType = "easyui-textbox"
+
+	modsf4 := NewSQLFiled{}
+	modsf4.Add = true
+	modsf4.List = true
+	modsf4.Label = "主字段"
+	modsf4.Name = "apptitlef"
+	modsf4.AddRequire = true
+	modsf4.JuiType = "easyui-textbox"
+
+	modsf5 := NewSQLFiled{}
+	modsf5.Add = true
+	modsf5.List = true
+	modsf5.Label = "新建工具"
+	modsf5.Name = "allowadd"
+	modsf5.JuiType = "easyui-combobox"
+	modsf5.FDataOption = "valueField: 'id', textField: 'text',  data: [{  \"id\":1,  \"text\":\"允许新建\"},{\"id\":0,\"text\":\"禁止新建\"} ] "
+	modsf5.AddRequire = true
+
+	modsf6 := NewSQLFiled{}
+	modsf6.Add = true
+	modsf6.List = true
+	modsf6.Label = "编辑工具"
+	modsf6.Name = "allowdeit"
+	modsf6.JuiType = "easyui-combobox"
+	modsf6.FDataOption = "valueField: 'id', textField: 'text',  data: [{  \"id\":1,  \"text\":\"允许编辑\"},{\"id\":0,\"text\":\"禁止编辑\"} ] "
+	modsf6.AddRequire = true
+
+	modsf7 := NewSQLFiled{}
+	modsf7.Add = true
+	modsf7.List = true
+	modsf7.Label = "删除工具"
+	modsf7.Name = "allowdelete"
+	modsf7.JuiType = "easyui-combobox"
+	modsf7.FDataOption = "valueField: 'id', textField: 'text',  data: [{  \"id\":1,  \"text\":\"允许删除\"},{\"id\":0,\"text\":\"禁止删除\"} ] "
+	modsf7.AddRequire = true
+
+	var f4s []NewSQLFiled
+	f4s = append(f4s, modsf1, modsf2, modsf3, modsf4, modsf5, modsf6, modsf7)
+	newmmod.Fileds = f4s
+
+	newmf := NewSQLModel{}
+	newmf.AllowAdd = true
+	newmf.AllowDelete = true
+	newmf.Allowupdate = true
+	newmf.AppKey = "fsconfig"
+	newmf.AppName = "字段"
+	newmf.TitleFiled = "aname"
+	newmf.DataKey = "fsconfigf"
+
+	mf1 := NewSQLFiled{}
+	mf1.Add = true
+	mf1.List = true
+	mf1.Label = "字段"
+	mf1.Name = "aname"
+	mf1.AddRequire = true
+	mf1.JuiType = "easyui-textbox"
+	mf1.ListWidth = "60px"
+
+	mf2 := NewSQLFiled{}
+	mf2.Add = true
+	mf2.List = true
+	mf2.Label = "标签"
+	mf2.Name = "fname"
+	mf2.AddRequire = true
+	mf2.JuiType = "easyui-textbox"
+
+	mf3 := NewSQLFiled{}
+	mf3.Add = true
+	mf3.List = true
+	mf3.Label = "模块"
+	mf3.Name = "mods"
+	mf3.JuiType = "easyui-combobox"
+	//mf3.FDataOption = "valueField: 'text', textField: 'text',  data: [{  \"id\":1,  \"text\":\"成交客户\"},{\"id\":2,\"text\":\"重点客户\"},{\"id\":3,\"text\":\"无效客户\"}] "
+	mf3.FDataOption = "valueField: 'text', textField: 'text', url:'/data_select_values/?keys=modsconfig'   "
+
+	mf4 := NewSQLFiled{}
+	mf4.Add = true
+	mf4.List = true
+	mf4.Label = "类型"
+	mf4.Name = "ftype"
+	mf4.JuiType = "easyui-combobox"
+	mf4.FDataOption = "valueField: 'text', textField: 'text',  data: [{  \"id\":1,  \"text\":\"easyui-textbox\"},{\"id\":2,\"text\":\"easyui-combobox\"},{\"id\":3,\"text\":\"无效客户\"}] "
+	//mf4.FDataOption = "valueField: 'text', textField: 'text', url:'/data_select_values/?keys=modsconfig'   "
+
+	mf5 := NewSQLFiled{}
+	mf5.Add = true
+	mf5.List = true
+	mf5.Label = "类型"
+	mf5.Name = "frequire"
+	mf5.JuiType = "easyui-combobox"
+	mf5.FDataOption = "valueField: 'text', textField: 'text',  data: [{  \"id\":1,  \"text\":\"必填\"},{\"id\":2,\"text\":\"非必填\"} ] "
+
+	mf6 := NewSQLFiled{}
+	mf6.Add = true
+	mf6.List = true
+	mf6.Label = "字段选项"
+	mf6.Name = "dataoption"
+	mf6.JuiType = "easyui-textbox"
+
+	var f5s []NewSQLFiled
+	f5s = append(f5s, mf1, mf2, mf3, mf4, mf5, mf6)
+	newmf.Fileds = f5s
+
+	mNewSQLModel["app"] = newm
+	mNewSQLModel["contact"] = newm2
+	mNewSQLModel["config"] = newm3
+	mNewSQLModel["modsconfig"] = newmmod
+
+	mNewSQLModel["fsconfig"] = newmf
 }
 
 type NewSQLSelectValue struct {

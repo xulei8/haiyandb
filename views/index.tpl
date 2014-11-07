@@ -32,15 +32,26 @@
         .fitem input{
             width:160px;
         }
+		.nav{ clear:both  ; display:block ; height:25px; }
+		.nav  li a { font-size:12px; }
+		.nav li{ list-style-type: none ; float:left ; width:80px;  }
     </style>
 	
 	
 	
 </head>
 <body>
-    	
+   
+		<div class=nav>
+<li><a href="/data_app?app=contact">客户管理</a></li>
+<li><a href="/data_app?app=config">配置管理</a></li>
+<li><a href="/data_app?app=modsconfig">模块管理</a></li>
+<li><a href="/data_app?app=fsconfig">字段管理</a></li>
 
-				
+
+
+<li><a href="/demo">Demo</a></li>
+				</div> 	
  	
     <table id="dg" title="{{.AppName}}管理" class="easyui-datagrid" style="width:900px;height:450px"
             url="/data_get/?modName={{.ModName}}"
@@ -57,7 +68,7 @@
 					{{if .ListWidth}}
 					style=" width:{{.ListWidth}};  "
 					{{else}}
-					style=" min-width:50;  "
+					style=" min-width:50px;  "
 					{{end}}
 					>{{.Label}}</th>
 			 {{end}}

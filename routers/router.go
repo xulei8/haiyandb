@@ -22,5 +22,7 @@ func init() {
 	beego.Router("/data_delete/", &controllers.NewSQLDelete{})
 	beego.Router("/data_update/", &controllers.NewSQLUpdate{})
 	beego.Router("/data_select_values/", &controllers.NewSQLSelectValue{})
+	beego.Router("/data_app/", &controllers.NewSQLApp{})
+	beego.Router("/demo", &controllers.MainController{})
 
 }
