@@ -41,13 +41,13 @@
 	
 </head>
 <body>
-   
+    
 		<div class=nav>
 <li><a href="/data_app?app=contact">客户管理</a></li>
 <li><a href="/data_app?app=config">配置管理</a></li>
 <li><a href="/data_app?app=modsconfig">模块管理</a></li>
 <li><a href="/data_app?app=fsconfig">字段管理</a></li>
-
+<li><a href="/data_app?app=shangji">商机</a></li>
 
 
 <li><a href="/demo">Demo</a></li>
@@ -90,17 +90,26 @@
 	   {{end}}  
  </div>
     
-    <div id="dlg" class="easyui-dialog" style="width:400px;height:280px;padding:10px 20px"
+    <div id="dlg" class="easyui-dialog" style="width:500px;height:480px;padding:10px 20px"
             closed="true" buttons="#dlg-buttons">
         <div class="ftitle">{{.AppName}}信息</div>
         <form id="fm" method="post" novalidate>
              {{range .FS}}
 	                
 						 <div class="fitem {{if .HideInNew}} filedHideInNew {{end}}   {{if .HideInEdit}} filedHideInEdit {{end}}" hideInNew="{{.HideInNew}}"  HideInEdit="{{.HideInEdit}}">
-			                <label>{{.Label}}</label>
+			                <label 
+							{{if .LabelAddTip}}
+							title="{{.LabelAddTip}}" class="easyui-tooltip"
+							{{end}}
+							>{{.Label}}</label>
 			             
-							    <input name="{{.Name}}" class="{{.JuiType}}"  
+							    <input name="{{.Name}}"
+								 class="{{.JuiType}}"  
  id="{{.Name}}" 	 
+
+						{{if .Value }}
+							value="{{.Value}}"
+						{{end}}
 							{{if .AddRequire }}
 							required="true"
 							{{end}}

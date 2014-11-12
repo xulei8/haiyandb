@@ -1,8 +1,6 @@
 package controllers
 
-import (
-	"github.com/astaxie/beego"
-)
+import "github.com/astaxie/beego"
 
 type MainController struct {
 	beego.Controller
@@ -29,7 +27,7 @@ func (this *NewSQLApp) Get() {
 }
 
 func (this *MainController) Get() {
-
+	ReloadMySQLMod()
 	mod := "app"
 	this.Data["AppName"] = mNewSQLModel[mod].AppName
 	this.Data["ModName"] = mod
@@ -41,6 +39,7 @@ func (this *MainController) Get() {
 
 	this.Data["Website"] = "beego.me"
 	this.Data["Email"] = "astaxie@gmail.com"
+
 	this.TplNames = "index.tpl"
 }
 

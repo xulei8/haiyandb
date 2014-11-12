@@ -1,12 +1,35 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"time"
 )
 
+type MySQLModConfig struct {
+	Id        int
+	Aname     string
+	Appkeyf   string
+	Appname   string
+	Apptitlef string
+
+	Allowadd  string
+	Allowedit string
+
+	Allowdelete string
+}
+
+type MySQLModFieldConfig struct {
+	Fname      string
+	Aname      string
+	Ftype      string
+	Frequire   string
+	Dataoption string
+	Addtip     string
+}
 type NewSQLFiled struct {
 	Label      string
 	Name       string
@@ -19,8 +42,10 @@ type NewSQLFiled struct {
 	HideInEdit bool
 	HideInList bool
 	JuiType    string
+	Value      string
 
 	FDataOption string
+	LabelAddTip string
 }
 
 type NewSQLModel struct {
@@ -274,7 +299,7 @@ func init() {
 	modsf3.Add = true
 	modsf3.List = true
 	modsf3.Label = "主键名"
-	modsf3.Name = "appkef"
+	modsf3.Name = "appkeyf"
 	modsf3.AddRequire = true
 	modsf3.JuiType = "easyui-textbox"
 
@@ -299,7 +324,7 @@ func init() {
 	modsf6.Add = true
 	modsf6.List = true
 	modsf6.Label = "编辑工具"
-	modsf6.Name = "allowdeit"
+	modsf6.Name = "allowedit"
 	modsf6.JuiType = "easyui-combobox"
 	modsf6.FDataOption = "valueField: 'id', textField: 'text',  data: [{  \"id\":1,  \"text\":\"允许编辑\"},{\"id\":0,\"text\":\"禁止编辑\"} ] "
 	modsf6.AddRequire = true
@@ -349,8 +374,8 @@ func init() {
 	mf3.Label = "模块"
 	mf3.Name = "mods"
 	mf3.JuiType = "easyui-combobox"
-	//mf3.FDataOption = "valueField: 'text', textField: 'text',  data: [{  \"id\":1,  \"text\":\"成交客户\"},{\"id\":2,\"text\":\"重点客户\"},{\"id\":3,\"text\":\"无效客户\"}] "
-	mf3.FDataOption = "valueField: 'text', textField: 'text', url:'/data_select_values/?keys=modsconfig'   "
+	//mf3.FDataOption = "valueField: 'id', textField: 'text',  data: [{  \"id\":1,  \"text\":\"成交客户\"},{\"id\":2,\"text\":\"重点客户\"},{\"id\":3,\"text\":\"无效客户\"}] "
+	mf3.FDataOption = "valueField: 'id', textField: 'text', url:'/data_select_values/?keys=modsconfig'   "
 
 	mf4 := NewSQLFiled{}
 	mf4.Add = true
@@ -358,7 +383,13 @@ func init() {
 	mf4.Label = "类型"
 	mf4.Name = "ftype"
 	mf4.JuiType = "easyui-combobox"
-	mf4.FDataOption = "valueField: 'text', textField: 'text',  data: [{  \"id\":1,  \"text\":\"easyui-textbox\"},{\"id\":2,\"text\":\"easyui-combobox\"},{\"id\":3,\"text\":\"无效客户\"}] "
+	mf4.FDataOption = `valueField: 'id', textField: 'text',  data: [
+	{ "id":"easyui-textbox",  "text":"文本框"}
+	,{"id":"easyui-combobox","text":"下拉菜单"}
+	,{"id":"easyui-numberspinner","text":"数字下拉"}
+	,{"id":"easyui-datebox","text":"日期"}
+	
+	] `
 	//mf4.FDataOption = "valueField: 'text', textField: 'text', url:'/data_select_values/?keys=modsconfig'   "
 
 	mf5 := NewSQLFiled{}
@@ -369,15 +400,33 @@ func init() {
 	mf5.JuiType = "easyui-combobox"
 	mf5.FDataOption = "valueField: 'text', textField: 'text',  data: [{  \"id\":1,  \"text\":\"必填\"},{\"id\":2,\"text\":\"非必填\"} ] "
 
+	mfo := NewSQLFiled{}
+	mfo.Add = true
+	mfo.List = true
+	mfo.Label = "排序"
+	mfo.Name = "forder"
+	mfo.JuiType = "easyui-numberspinner"
+	mfo.Value = "50"
+
+	mft := NewSQLFiled{}
+	mft.Add = true
+	mft.List = true
+	mft.Label = "添加帮助"
+	mft.Name = "addTip"
+	mft.JuiType = "easyui-textbox"
+
 	mf6 := NewSQLFiled{}
 	mf6.Add = true
 	mf6.List = true
 	mf6.Label = "字段选项"
 	mf6.Name = "dataoption"
 	mf6.JuiType = "easyui-textbox"
+	mf6.LabelAddTip = `下拉项例子：valueField: 'id', textField: 'text',  data: [ {id:'5',text :'5rrrr5'}  ]
+	模块下拉项：valueField: 'id', textField: 'text', url:'/data_select_values/?keys=modsconfig' 
+	`
 
 	var f5s []NewSQLFiled
-	f5s = append(f5s, mf1, mf2, mf3, mf4, mf5, mf6)
+	f5s = append(f5s, mf1, mf2, mf3, mf4, mf5, mfo, mft, mf6)
 	newmf.Fileds = f5s
 
 	mNewSQLModel["app"] = newm
@@ -386,6 +435,95 @@ func init() {
 	mNewSQLModel["modsconfig"] = newmmod
 
 	mNewSQLModel["fsconfig"] = newmf
+	InitMySQLMod()
+	fmt.Print("\n\n\n", mNewSQLModel, "\n\n\n")
+
+}
+
+func ReloadMySQLMod() {
+	InitMySQLMod()
+}
+func InitMySQLMod() {
+	o := orm.NewOrm()
+	var dd []NewsqlData
+	sql := `select  id  , title ,createtime, column_json(data)   as data
+	  from app where type = 'mods' and deleted = 0  
+	 order by id `
+	/*
+		aname   string
+		appkeyf string
+		appname string
+
+		allowadd    string
+		allowedit   string
+		apptitlef   string
+		allowdelete string
+	*/
+	fmt.Printf(sql)
+	o.Raw(sql).QueryRows(&dd)
+	//_, _ :=
+	for _, v := range dd {
+
+		fmt.Print("\n\n\n", v, "\n\n\n")
+		fmt.Print("\n\n\n", v.Data, "\n\n\n")
+		b := []byte(v.Data)
+		var modMySQl MySQLModConfig
+		json.Unmarshal(b, &modMySQl)
+		modMySQl.Id = v.Id
+		fmt.Printf("Mod: %+v  \n", modMySQl)
+
+		newModMySQLtmp := NewSQLModel{}
+		newModMySQLtmp.AppName = modMySQl.Aname
+		newModMySQLtmp.AppKey = modMySQl.Appname
+		newModMySQLtmp.DataKey = modMySQl.Appkeyf
+		if modMySQl.Allowadd == "1" {
+			newModMySQLtmp.AllowAdd = true
+		}
+
+		if modMySQl.Allowedit == "1" {
+			newModMySQLtmp.Allowupdate = true
+		}
+		if modMySQl.Allowdelete == "1" {
+			newModMySQLtmp.AllowDelete = true
+		}
+		idstr := fmt.Sprintf("%d", v.Id)
+		sqlf := `select  id  , title ,createtime, 
+		column_json(data)   as data
+	  from app 
+	where
+	 type = 'fsconfigf' 
+	and deleted = 0  
+	and  
+	 COLUMN_GET(data , 'mods' as int  ) = '` + idstr + `'
+	 order by 
+	 COLUMN_GET(data , 'forder' as int  )   `
+
+		var dds []NewsqlData
+		o.Raw(sqlf).QueryRows(&dds)
+		var fieldstmp []NewSQLFiled
+		for _, v2 := range dds {
+			fmt.Print(v2.Data)
+			bs := []byte(v2.Data)
+			var fconfig MySQLModFieldConfig
+			json.Unmarshal(bs, &fconfig)
+			fmt.Print("\nNewConfig:\n", fconfig.Fname)
+			mft := NewSQLFiled{}
+			mft.Add = true
+			mft.List = true
+			mft.Label = fconfig.Fname
+			mft.Name = fconfig.Aname
+			if fconfig.Frequire == "必填" {
+				mft.AddRequire = true
+			}
+			mft.LabelAddTip = fconfig.Addtip
+			mft.FDataOption = fconfig.Dataoption
+			mft.JuiType = fconfig.Ftype
+			mft.ListWidth = "60px"
+			fieldstmp = append(fieldstmp, mft)
+		}
+		newModMySQLtmp.Fileds = fieldstmp
+		mNewSQLModel[newModMySQLtmp.AppKey] = newModMySQLtmp
+	}
 }
 
 type NewSQLSelectValue struct {
